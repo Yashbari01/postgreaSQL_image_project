@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+</head>
+<body>
+    <h1>Image Upload and Retrieval</h1>
+    
+    <h2>Upload Image</h2>
+    <form id="uploadForm">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    
+    <h2>Retrieve Image</h2>
+    <input type="number" id="imageId" placeholder="Enter image ID" required>
+    <button id="retrieveButton">Retrieve Image</button>
+    
+    <h2>Image Preview</h2>
+    <img id="imagePreview" style="display: none; max-width: 300px; max-height: 300px;" alt="Image Preview">
+    
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert(`Image uploaded! ID: ${result.id}`);
+            } else {
+                alert('Error uploading image');
+            }
+        });
+
+        document.getElementById('retrieveButton').addEventListener('click', async function() {
+            const id = document.getElementById('imageId').value;
+            const response = await fetch(`http://localhost:5000/image/${id}`);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = url;
+                imagePreview.style.display = 'block';
+            } else {
+                alert('Error retrieving image');
+            }
+        });
+    </script>
+</body>
+</html>
